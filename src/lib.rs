@@ -39,6 +39,24 @@ impl Led {
         }
     }
 
+    fn from_rgb_array(data: &[u8; 3]) -> Self {
+        Led {
+            r: data[0],
+            g: data[1],
+            b: data[2],
+            w: 0,
+        }
+    }
+
+    fn from_rgbw_array(data: &[u8; 4]) -> Self {
+        Led {
+            r: data[0],
+            g: data[1],
+            b: data[2],
+            w: data[3],
+        }
+    }
+
     fn to_sk6812_byte_vec(&self) -> Vec<u8> {
         [self.g, self.r, self.b, self.w]
             .view_bits::<Msb0>()
@@ -50,8 +68,12 @@ impl Led {
             .collect()
     }
 
-    fn to_rgbw(&self) -> [u8; 4] {
+    fn to_rgbw_array(&self) -> [u8; 4] {
         [self.r, self.g, self.b, self.w]
+    }
+
+    fn to_rgb_array(&self) -> [u8; 3] {
+        [self.r, self.g, self.b]
     }
 }
 
@@ -62,15 +84,7 @@ impl SK6812RGBWStrip {
     pub fn new(bus: Bus, amount_of_leds: usize) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             spi: Spi::new(bus, SlaveSelect::Ss0, SPI_FREQUENCY, Mode::Mode0)?,
-            leds: vec![
-                Led {
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    w: 0
-                };
-                amount_of_leds
-            ],
+            leds: vec![Led::new(); amount_of_leds],
         })
     }
 
@@ -150,16 +164,20 @@ mod tests {
 
     #[test]
     fn test_led_to_byte_array_conversion() {
-        assert_eq!(
-            Led {
-                r: 10,
-                g: 20,
-                b: 30,
-                w: 40
-            }
-            .to_rgbw(),
-            [10, 20, 30, 40]
-        );
+        let led = Led {
+            r: 10,
+            g: 20,
+            b: 30,
+            w: 40,
+        };
+
+        assert_eq!(led.to_rgbw_array(), [10, 20, 30, 40]);
+        assert_eq!(led.to_rgb_array(), [10, 20, 30]);
+    }
+
+    #[test]
+    fn test_led_from_array_creation() {
+        let led_rgb = Led::from_rgb_array([10, 20, 30]);
     }
 
     #[test]
