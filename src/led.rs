@@ -6,7 +6,7 @@ const BIT_HIGH: u8 = 0b11110000;
 const BIT_LOW: u8 = 0b11000000;
 
 /// Structure representing a single RGBW LED
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Led {
     pub r: u8,
     pub g: u8,

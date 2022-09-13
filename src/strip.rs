@@ -1,7 +1,7 @@
-pub use rppal::spi::{Bus, SlaveSelect};
-use std::{time::Duration, thread, error::Error};
-use rppal::spi::{Mode, Spi};
 use crate::led::Led;
+pub use rppal::spi::{Bus, SlaveSelect};
+use rppal::spi::{Mode, Spi};
+use std::{error::Error, thread, time::Duration};
 
 const SPI_FREQUENCY: u32 = 6_400_000;
 
@@ -37,8 +37,8 @@ impl Strip {
     }
 
     /// Set the color of all LEDs in the strip at once
-    pub fn set_color(&mut self, led: &Led) {
-        self.leds.fill(*led);
+    pub fn set_color(&mut self, led: Led) {
+        self.leds.fill(led);
     }
 
     pub fn clear(&mut self) {
@@ -67,4 +67,33 @@ impl Strip {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn make_strip() -> Strip {
+        Strip::new(Bus::Spi0, 144).unwrap()
+    }
+
+    #[test]
+    fn test_setting_color() {
+        let led: Led = [100, 0, 0].into();
+        let mut strip = make_strip();
+
+        strip.set_color(led);
+
+        strip.leds.iter().for_each(|strip_led| {
+            assert_eq!(*strip_led, led);
+        })
+    }
+
+    #[test]
+    fn test_clearing() {
+        let led: Led = [100, 0, 0].into();
+        let mut strip = make_strip();
+
+        strip.set_color(led);
+        strip.clear();
+
+        strip.leds.iter().for_each(|strip_led| {
+            assert_eq!(*strip_led, Led::new());
+        })
+    }
 }

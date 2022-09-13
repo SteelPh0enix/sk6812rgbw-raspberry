@@ -8,7 +8,7 @@ mod common;
 fn test_strip_single_color_fill() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
-    strip.set_color(&Led {
+    strip.set_color(Led {
         r: 250,
         g: 0,
         b: 200,
@@ -39,7 +39,7 @@ fn show_all_colors() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
     test_colors.iter().for_each(|led| {
-        strip.set_color(led);
+        strip.set_color(*led);
         strip.update().unwrap();
         thread::sleep(COLOR_DELAY);
     });
