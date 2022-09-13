@@ -30,6 +30,15 @@ pub struct SK6812RGBWStrip {
 }
 
 impl Led {
+    fn new() -> Self {
+        Led {
+            r: 0,
+            g: 0,
+            b: 0,
+            w: 0,
+        }
+    }
+
     fn to_sk6812_byte_vec(&self) -> Vec<u8> {
         [self.g, self.r, self.b, self.w]
             .view_bits::<Msb0>()
@@ -39,6 +48,10 @@ impl Led {
                 false => BIT_LOW,
             })
             .collect()
+    }
+
+    fn to_rgbw(&self) -> [u8; 4] {
+        [self.r, self.g, self.b, self.w]
     }
 }
 
@@ -70,15 +83,7 @@ impl SK6812RGBWStrip {
     ) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             spi: Spi::new(bus, slave_select, SPI_FREQUENCY, Mode::Mode0)?,
-            leds: vec![
-                Led {
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    w: 0
-                };
-                amount_of_leds
-            ],
+            leds: vec![Led::new(); amount_of_leds],
         })
     }
 
@@ -88,19 +93,14 @@ impl SK6812RGBWStrip {
     }
 
     pub fn clear(&mut self) {
-        self.leds.fill(Led {
-            r: 0,
-            g: 0,
-            b: 0,
-            w: 0,
-        });
+        self.leds.fill(Led::new());
     }
 
     /// Call this to send the data from `leds` to the strip
     /// This function will block the thread for ~80us after sending the data,
     /// which is caused by strip comms protocol requirements.
     ///
-    /// If you're getting an error, telling you that the message is too long - increase the SPI tranfer size in `/boot/cmdline.txt`.
+    /// If you're getting an error, telling you that the message is too long - increase the SPI transfer size in `/boot/cmdline.txt`.
     /// To do so, add `spidev.bufsiz=65535` to the first line of this file. I added it right before `rootwait`, but placement shouldn't matter.
     pub fn update(&mut self) -> Result<(), Box<dyn Error>> {
         let led_data: Vec<u8> = self.get_led_data();
@@ -149,8 +149,38 @@ mod tests {
     }
 
     #[test]
-    fn test_strip_update() -> Result<(), Box<dyn Error>> {
-        const COLOR_DELAY: Duration = Duration::from_millis(1000);
+    fn test_led_to_byte_array_conversion() {
+        assert_eq!(
+            Led {
+                r: 10,
+                g: 20,
+                b: 30,
+                w: 40
+            }
+            .to_rgbw(),
+            [10, 20, 30, 40]
+        );
+    }
+
+    #[test]
+    fn test_strip_single_color_fill() -> Result<(), Box<dyn Error>> {
+        let mut strip = SK6812RGBWStrip::new(Bus::Spi0, LED_AMOUNT)?;
+
+        strip.set_color(&Led {
+            r: 100,
+            g: 0,
+            b: 0,
+            w: 0,
+        });
+        strip.update()?;
+
+        Ok(())
+    }
+
+    #[test]
+    #[ignore]
+    fn show_all_colors() -> Result<(), Box<dyn Error>> {
+        const COLOR_DELAY: Duration = Duration::from_millis(500);
 
         let mut strip = SK6812RGBWStrip::new(Bus::Spi0, LED_AMOUNT)?;
         strip.set_color(&Led {
@@ -237,8 +267,9 @@ mod tests {
     }
 
     #[test]
-    fn clear_leds() -> Result<(), Box<dyn Error>> {
+    fn test_strip_clearing() -> Result<(), Box<dyn Error>> {
         let mut strip = SK6812RGBWStrip::new(Bus::Spi0, LED_AMOUNT)?;
+
         strip.clear();
         strip.update().unwrap();
 
