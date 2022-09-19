@@ -1,4 +1,5 @@
 use bitvec::prelude::*;
+use palette::Srgb;
 
 /// High bit (logical 1) representation for SPI
 const BIT_HIGH: u8 = 0b11110000;
@@ -27,6 +28,14 @@ impl Led {
         data.into()
     }
 
+    pub fn to_rgbw_array(self) -> [u8; 4] {
+        self.into()
+    }
+
+    pub fn to_rgb_array(self) -> [u8; 3] {
+        self.into()
+    }
+
     /// Converts the instance of this struct to SK6812-compatible byte array for SPI.
     /// Don't use in your own code, unless you know what you're doing.
     pub fn to_sk6812_bytes(&self) -> Vec<u8> {
@@ -38,14 +47,6 @@ impl Led {
                 false => BIT_LOW,
             })
             .collect()
-    }
-
-    pub fn to_rgbw_array(self) -> [u8; 4] {
-        self.into()
-    }
-
-    pub fn to_rgb_array(self) -> [u8; 3] {
-        self.into()
     }
 }
 
@@ -83,8 +84,31 @@ impl From<[u8; 4]> for Led {
     }
 }
 
+impl Into<Srgb> for Led {
+    fn into(self) -> Srgb {
+        Srgb::from_components((
+            (self.r as f32) / 255.0,
+            (self.g as f32) / 255.0,
+            (self.b as f32) / 255.0,
+        ))
+    }
+}
+
+impl From<Srgb> for Led {
+    fn from(color: Srgb) -> Self {
+        [
+            (color.red * 255.0) as u8,
+            (color.green * 255.0) as u8,
+            (color.blue * 255.0) as u8,
+        ]
+        .into()
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use palette::Srgb;
+
     use super::*;
 
     #[test]
@@ -131,5 +155,34 @@ mod tests {
 
         assert_eq!(led_rgb.to_rgb_array(), [10, 20, 30]);
         assert_eq!(led_rgbw.to_rgbw_array(), [10, 20, 30, 40]);
+    }
+
+    #[test]
+    fn test_pixel_implementation_create_from_raw_data() {
+        let pixel_raw_rgbw_data = [10, 20, 30, 40];
+        let pixel_rgbw = Led::from_rgbw_array(pixel_raw_rgbw_data);
+        let led_rgbw: Led = pixel_raw_rgbw_data.into();
+
+        assert_eq!(led_rgbw, pixel_rgbw);
+    }
+
+    #[test]
+    fn test_pixel_implementation_create_srgb_pixel_from_led() {
+        let led: Led = [51, 102, 204].into();
+        let pixel: Srgb = led.into();
+
+        assert_eq!(pixel.red, 0.2);
+        assert_eq!(pixel.green, 0.4);
+        assert_eq!(pixel.blue, 0.8);
+    }
+
+    #[test]
+    fn test_pixel_implementation_create_led_from_srgb_pixel() {
+        let pixel = Srgb::from_components((0.2, 0.4, 0.8));
+        let led: Led = pixel.into();
+
+        assert_eq!(led.r, 51);
+        assert_eq!(led.g, 102);
+        assert_eq!(led.b, 204);
     }
 }
