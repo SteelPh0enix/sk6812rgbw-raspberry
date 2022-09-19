@@ -1,4 +1,4 @@
-use std::{time::Duration, error::Error, thread};
+use std::{error::Error, thread, time::Duration};
 
 use sk6812::led::Led;
 
@@ -8,7 +8,7 @@ mod common;
 fn test_strip_single_color_fill() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
-    strip.set_color(Led {
+    strip.fill(Led {
         r: 250,
         g: 0,
         b: 200,
@@ -39,7 +39,7 @@ fn show_all_colors() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
     test_colors.iter().for_each(|led| {
-        strip.set_color(*led);
+        strip.fill(*led);
         strip.update().unwrap();
         thread::sleep(COLOR_DELAY);
     });

@@ -1,5 +1,5 @@
 use bitvec::prelude::*;
-use palette::Srgb;
+use palette::{FromColor, Hsl, Hsv, Srgb};
 
 /// High bit (logical 1) representation for SPI
 const BIT_HIGH: u8 = 0b11110000;
@@ -102,6 +102,32 @@ impl From<Srgb> for Led {
             (color.blue * 255.0) as u8,
         ]
         .into()
+    }
+}
+
+impl Into<Hsv> for Led {
+    fn into(self) -> Hsv {
+        let srgb_color: Srgb = self.into();
+        Hsv::from_color(srgb_color)
+    }
+}
+
+impl From<Hsv> for Led {
+    fn from(color: Hsv) -> Self {
+        Srgb::from_color(color).into_format().into()
+    }
+}
+
+impl Into<Hsl> for Led {
+    fn into(self) -> Hsl {
+        let srgb_color: Srgb = self.into();
+        Hsl::from_color(srgb_color)
+    }
+}
+
+impl From<Hsl> for Led {
+    fn from(color: Hsl) -> Self {
+        Srgb::from_color(color).into_format().into()
     }
 }
 

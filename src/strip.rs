@@ -37,7 +37,7 @@ impl Strip {
     }
 
     /// Set the color of all LEDs in the strip at once
-    pub fn set_color(&mut self, led: Led) {
+    pub fn fill(&mut self, led: Led) {
         self.leds.fill(led);
     }
 
@@ -77,7 +77,7 @@ mod tests {
         let led: Led = [100, 0, 0].into();
         let mut strip = make_strip();
 
-        strip.set_color(led);
+        strip.fill(led);
 
         strip.leds.iter().for_each(|strip_led| {
             assert_eq!(*strip_led, led);
@@ -89,7 +89,7 @@ mod tests {
         let led: Led = [100, 0, 0].into();
         let mut strip = make_strip();
 
-        strip.set_color(led);
+        strip.fill(led);
         strip.clear();
 
         strip.leds.iter().for_each(|strip_led| {
