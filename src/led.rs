@@ -1,3 +1,5 @@
+use std::ops::{Add, Div, Mul, Sub};
+
 use bitvec::prelude::*;
 use palette::{FromColor, Hsl, Hsv, Srgb};
 
@@ -18,6 +20,24 @@ pub struct Led {
 impl Led {
     pub fn new() -> Self {
         Default::default()
+    }
+
+    pub fn from_rgb(red: u8, green: u8, blue: u8) -> Self {
+        Self {
+            r: red,
+            g: green,
+            b: blue,
+            w: 0,
+        }
+    }
+
+    pub fn from_rgbw(red: u8, green: u8, blue: u8, white: u8) -> Self {
+        Self {
+            r: red,
+            g: green,
+            b: blue,
+            w: white,
+        }
     }
 
     pub fn from_rgb_array(data: [u8; 3]) -> Self {
@@ -47,6 +67,126 @@ impl Led {
                 false => BIT_LOW,
             })
             .collect()
+    }
+}
+
+impl Add for Led {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Led::from_rgbw_array([
+            self.r.checked_add(rhs.r).or(Some(u8::MAX)).unwrap(),
+            self.g.checked_add(rhs.g).or(Some(u8::MAX)).unwrap(),
+            self.b.checked_add(rhs.b).or(Some(u8::MAX)).unwrap(),
+            self.w.checked_add(rhs.w).or(Some(u8::MAX)).unwrap(),
+        ])
+    }
+}
+
+impl Sub for Led {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Led::from_rgbw_array([
+            self.r.checked_sub(rhs.r).or(Some(0)).unwrap(),
+            self.g.checked_sub(rhs.g).or(Some(0)).unwrap(),
+            self.b.checked_sub(rhs.b).or(Some(0)).unwrap(),
+            self.w.checked_sub(rhs.w).or(Some(0)).unwrap(),
+        ])
+    }
+}
+
+impl Mul for Led {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Led::from_rgbw_array([
+            self.r.checked_mul(rhs.r).or(Some(u8::MAX)).unwrap(),
+            self.g.checked_mul(rhs.g).or(Some(u8::MAX)).unwrap(),
+            self.b.checked_mul(rhs.b).or(Some(u8::MAX)).unwrap(),
+            self.w.checked_mul(rhs.w).or(Some(u8::MAX)).unwrap(),
+        ])
+    }
+}
+
+impl Div for Led {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Led::from_rgbw_array([
+            self.r.checked_div(rhs.r).or(Some(0)).unwrap(),
+            self.g.checked_div(rhs.g).or(Some(0)).unwrap(),
+            self.b.checked_div(rhs.b).or(Some(0)).unwrap(),
+            self.w.checked_div(rhs.w).or(Some(0)).unwrap(),
+        ])
+    }
+}
+
+impl Add<u8> for Led {
+    type Output = Self;
+
+    fn add(self, rhs: u8) -> Self::Output {
+        self + Led::from_rgbw(rhs, rhs, rhs, rhs)
+    }
+}
+
+impl Sub<u8> for Led {
+    type Output = Self;
+
+    fn sub(self, rhs: u8) -> Self::Output {
+        self - Led::from_rgbw(rhs, rhs, rhs, rhs)
+    }
+}
+
+impl Mul<u8> for Led {
+    type Output = Self;
+
+    fn mul(self, rhs: u8) -> Self::Output {
+        self * Led::from_rgbw(rhs, rhs, rhs, rhs)
+    }
+}
+
+impl Div<u8> for Led {
+    type Output = Self;
+
+    fn div(self, rhs: u8) -> Self::Output {
+        self / Led::from_rgbw(rhs, rhs, rhs, rhs)
+    }
+}
+
+impl Add<f32> for Led {
+    type Output = Self;
+
+    fn add(self, rhs: f32) -> Self::Output {
+        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
+        self + Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
+    }
+}
+
+impl Sub<f32> for Led {
+    type Output = Self;
+
+    fn sub(self, rhs: f32) -> Self::Output {
+        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
+        self - Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
+    }
+}
+
+impl Mul<f32> for Led {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
+        self * Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
+    }
+}
+
+impl Div<f32> for Led {
+    type Output = Self;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
+        self / Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
     }
 }
 
@@ -87,9 +227,9 @@ impl From<[u8; 4]> for Led {
 impl Into<Srgb> for Led {
     fn into(self) -> Srgb {
         Srgb::from_components((
-            (self.r as f32) / 255.0,
-            (self.g as f32) / 255.0,
-            (self.b as f32) / 255.0,
+            (self.r as f32) / (u8::MAX as f32),
+            (self.g as f32) / (u8::MAX as f32),
+            (self.b as f32) / (u8::MAX as f32),
         ))
     }
 }
@@ -97,9 +237,9 @@ impl Into<Srgb> for Led {
 impl From<Srgb> for Led {
     fn from(color: Srgb) -> Self {
         [
-            (color.red * 255.0) as u8,
-            (color.green * 255.0) as u8,
-            (color.blue * 255.0) as u8,
+            (color.red * (u8::MAX as f32)) as u8,
+            (color.green * (u8::MAX as f32)) as u8,
+            (color.blue * (u8::MAX as f32)) as u8,
         ]
         .into()
     }
@@ -210,5 +350,41 @@ mod tests {
         assert_eq!(led.r, 51);
         assert_eq!(led.g, 102);
         assert_eq!(led.b, 204);
+    }
+
+    #[test]
+    fn test_led_add() {
+        let led_a = Led::from_rgbw(10, 20, 30, 40);
+        let led_b = Led::from_rgbw(10, 10, 10, 10);
+
+        let led_added = led_a + led_b;
+        assert_eq!(led_added, Led::from_rgbw(20, 30, 40, 50));
+    }
+
+    #[test]
+    fn test_led_sub() {
+        let led_a = Led::from_rgbw(10, 20, 30, 40);
+        let led_b = Led::from_rgbw(10, 10, 10, 10);
+
+        let led_added = led_a - led_b;
+        assert_eq!(led_added, Led::from_rgbw(0, 10, 20, 30));
+    }
+
+    #[test]
+    fn test_led_mul() {
+        let led_a = Led::from_rgbw(10, 20, 30, 40);
+        let led_b = Led::from_rgbw(3, 2, 1, 2);
+
+        let led_added = led_a * led_b;
+        assert_eq!(led_added, Led::from_rgbw(30, 40, 30, 80));
+    }
+
+    #[test]
+    fn test_led_div() {
+        let led_a = Led::from_rgbw(10, 20, 30, 40);
+        let led_b = Led::from_rgbw(2, 2, 1, 4);
+
+        let led_added = led_a / led_b;
+        assert_eq!(led_added, Led::from_rgbw(5, 10, 30, 10));
     }
 }
