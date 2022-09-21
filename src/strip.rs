@@ -1,5 +1,5 @@
 use crate::led::Led;
-use palette::{rgb::Rgb, Gradient, Srgb, encoding::Linear, LinSrgb};
+use palette::{Gradient, LinSrgb, Srgb};
 pub use rppal::spi::{Bus, SlaveSelect};
 use rppal::spi::{Mode, Spi};
 use std::{error::Error, thread, time::Duration};
@@ -48,9 +48,12 @@ impl Strip {
     }
 
     pub fn set_gradient(&mut self, gradient: Gradient<LinSrgb>) {
-        gradient.take(self.leds.len()).zip(&mut self.leds).for_each(|(color, led)| {
-            *led = Srgb::from_linear(color).into();
-        });
+        gradient
+            .take(self.leds.len())
+            .zip(&mut self.leds)
+            .for_each(|(color, led)| {
+                *led = Srgb::from_linear(color).into();
+            });
     }
 
     /// Call this to send the data from `leds` to the strip
