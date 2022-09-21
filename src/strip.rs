@@ -2,7 +2,12 @@ use crate::led::Led;
 use palette::{Gradient, LinSrgb, Srgb};
 pub use rppal::spi::{Bus, SlaveSelect};
 use rppal::spi::{Mode, Spi};
-use std::{error::Error, thread, time::Duration};
+use std::{
+    error::Error,
+    ops::{ShlAssign, ShrAssign},
+    thread,
+    time::Duration,
+};
 
 const SPI_FREQUENCY: u32 = 6_400_000;
 
@@ -56,6 +61,15 @@ impl Strip {
             });
     }
 
+    // "Rotate" LEDs to the beginning of the strip - move the first LED color to the end, 2nd to the first, and so on.
+    pub fn shift_left(&mut self, count: usize) {
+        self.leds.rotate_left(count);
+    }
+
+    pub fn shift_right(&mut self, count: usize) {
+        self.leds.rotate_right(count);
+    }
+
     /// Call this to send the data from `leds` to the strip
     /// This function will block the thread for ~80us after sending the data,
     /// which is caused by strip comms protocol requirements.
@@ -72,6 +86,18 @@ impl Strip {
 
     fn get_led_data(&self) -> impl Iterator<Item = u8> + '_ {
         self.leds.iter().flat_map(|led| led.to_sk6812_bytes())
+    }
+}
+
+impl ShrAssign<usize> for Strip {
+    fn shr_assign(&mut self, rhs: usize) {
+        self.shift_right(rhs);
+    }
+}
+
+impl ShlAssign<usize> for Strip {
+    fn shl_assign(&mut self, rhs: usize) {
+        self.shift_left(rhs);
     }
 }
 
@@ -106,5 +132,43 @@ mod tests {
         strip.leds.iter().for_each(|strip_led| {
             assert_eq!(*strip_led, Led::new());
         })
+    }
+
+    #[test]
+    fn test_shift_right() {
+        let mut strip = Strip::new(Bus::Spi0, 5).unwrap();
+
+        strip.leds[0].r = 1;
+        strip.leds[1].r = 2;
+        strip.leds[2].r = 3;
+        strip.leds[3].r = 4;
+        strip.leds[4].r = 5;
+
+        strip >>= 1;
+
+        assert_eq!(strip.leds[0].r, 5);
+        assert_eq!(strip.leds[1].r, 1);
+        assert_eq!(strip.leds[2].r, 2);
+        assert_eq!(strip.leds[3].r, 3);
+        assert_eq!(strip.leds[4].r, 4);
+    }
+
+    #[test]
+    fn test_shift_left() {
+        let mut strip = Strip::new(Bus::Spi0, 5).unwrap();
+
+        strip.leds[0].r = 1;
+        strip.leds[1].r = 2;
+        strip.leds[2].r = 3;
+        strip.leds[3].r = 4;
+        strip.leds[4].r = 5;
+
+        strip <<= 1;
+
+        assert_eq!(strip.leds[0].r, 2);
+        assert_eq!(strip.leds[1].r, 3);
+        assert_eq!(strip.leds[2].r, 4);
+        assert_eq!(strip.leds[3].r, 5);
+        assert_eq!(strip.leds[4].r, 1);
     }
 }
