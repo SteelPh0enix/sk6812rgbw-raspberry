@@ -1,4 +1,5 @@
 use crate::led::Led;
+use palette::{rgb::Rgb, Gradient, Srgb, encoding::Linear, LinSrgb};
 pub use rppal::spi::{Bus, SlaveSelect};
 use rppal::spi::{Mode, Spi};
 use std::{error::Error, thread, time::Duration};
@@ -14,7 +15,7 @@ pub struct Strip {
 
 impl Strip {
     /// Create new SK6812RGBW strip
-    /// Since rppal library requires slave-select pin to initalize SPI, by default SS0 is selected. It's not used to drive LED's, so it's a wasted pin.
+    /// Since rppal library requires slave-select pin to initalize SPI, by default SS0 is selected. It's not used to drive LEDs, so it's a wasted pin.
     /// If you want to select other pin, use `new_with_custom_ss` method.
     pub fn new(bus: Bus, amount_of_leds: usize) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
@@ -41,8 +42,15 @@ impl Strip {
         self.leds.fill(led);
     }
 
+    // Turn off all the LEDs
     pub fn clear(&mut self) {
         self.leds.fill(Led::new());
+    }
+
+    pub fn set_gradient(&mut self, gradient: Gradient<LinSrgb>) {
+        gradient.take(self.leds.len()).zip(&mut self.leds).for_each(|(color, led)| {
+            *led = Srgb::from_linear(color).into();
+        });
     }
 
     /// Call this to send the data from `leds` to the strip

@@ -9,10 +9,10 @@ fn test_strip_single_color_fill() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
     strip.fill(Led {
-        r: 250,
+        r: 200,
         g: 0,
-        b: 200,
-        w: 10,
+        b: 150,
+        w: 0,
     });
     strip.update()?;
 
