@@ -53,7 +53,7 @@ fn test_strip_clearing() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
     strip.clear();
-    strip.update().unwrap();
+    strip.update()?;
 
     Ok(())
 }
@@ -61,15 +61,35 @@ fn test_strip_clearing() -> Result<(), Box<dyn Error>> {
 #[test]
 fn test_strip_gradient() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
-    let colors: Vec<LinSrgb> =
-        (0..10).map(|i| Srgb::from_color(Hsv::new(i as f32 * 36.0, 1.0, 0.8)).into_linear()).collect();
-
-    println!("{colors:?}");
+    let colors: Vec<LinSrgb> = (0..10)
+        .map(|i| Srgb::from_color(Hsv::new(i as f32 * 36.0, 1.0, 0.8)).into_linear())
+        .collect();
 
     let gradient = Gradient::new(colors);
 
     strip.set_gradient(gradient);
-    strip.update().unwrap();
+    strip.update()?;
+
+    Ok(())
+}
+
+#[test]
+fn test_strip_gradient_shifting() -> Result<(), Box<dyn Error>> {
+    let mut strip = common::make_strip();
+    let colors: Vec<LinSrgb> = (0..360)
+        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 0.8)).into_linear())
+        .collect();
+
+    let shift_delay = Duration::from_millis(50);
+
+    strip.set_gradient(Gradient::new(colors));
+    strip.update()?;
+
+    (0..strip.leds.len()).for_each(|_| {
+        strip <<= 1;
+        strip.update().unwrap();
+        thread::sleep(shift_delay);
+    });
 
     Ok(())
 }
