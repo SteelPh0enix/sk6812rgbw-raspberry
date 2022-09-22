@@ -1,7 +1,7 @@
 use std::{error::Error, thread, time::Duration};
 
 use palette::{FromColor, Gradient, Hsv, LinSrgb, Srgb};
-use sk6812::led::Led;
+use sk6812_rpi::led::Led;
 
 mod common;
 
