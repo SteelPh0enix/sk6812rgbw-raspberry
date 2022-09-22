@@ -1,7 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use bitvec::prelude::*;
-use palette::{FromColor, Hsl, Hsv, Srgb};
+use palette::{rgb::Rgb, FromColor, Hsl, Hsv, Srgb};
 
 /// High bit (logical 1) representation for SPI
 const BIT_HIGH: u8 = 0b11110000;
@@ -224,18 +224,18 @@ impl From<[u8; 4]> for Led {
     }
 }
 
-impl Into<Srgb> for Led {
-    fn into(self) -> Srgb {
-        Srgb::from_components((
+impl Into<Rgb> for Led {
+    fn into(self) -> Rgb {
+        Rgb::new(
             (self.r as f32) / (u8::MAX as f32),
             (self.g as f32) / (u8::MAX as f32),
             (self.b as f32) / (u8::MAX as f32),
-        ))
+        )
     }
 }
 
-impl From<Srgb> for Led {
-    fn from(color: Srgb) -> Self {
+impl From<Rgb> for Led {
+    fn from(color: Rgb) -> Self {
         [
             (color.red * (u8::MAX as f32)) as u8,
             (color.green * (u8::MAX as f32)) as u8,
@@ -344,7 +344,7 @@ mod tests {
 
     #[test]
     fn test_pixel_implementation_create_led_from_srgb_pixel() {
-        let pixel = Srgb::from_components((0.2, 0.4, 0.8));
+        let pixel = Srgb::new(0.2, 0.4, 0.8);
         let led: Led = pixel.into();
 
         assert_eq!(led.r, 51);

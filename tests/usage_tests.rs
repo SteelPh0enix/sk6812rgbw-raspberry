@@ -1,6 +1,6 @@
 use std::{error::Error, thread, time::Duration};
 
-use palette::{FromColor, Gradient, Hsv, LinSrgb, Srgb};
+use palette::{FromColor, Gradient, Hsv, LinSrgb, Srgb, Hsl};
 use sk6812_rpi::led::Led;
 
 mod common;
@@ -90,6 +90,32 @@ fn test_strip_gradient_shifting() -> Result<(), Box<dyn Error>> {
         strip.update().unwrap();
         thread::sleep(shift_delay);
     });
+
+    Ok(())
+}
+
+#[test]
+fn test_direct_led_access() -> Result<(), Box<dyn Error>> {
+    let mut strip = common::make_strip();
+
+    // Direct access to Led fields
+    strip.leds[0].r = 100;
+    strip.leds[1].g = 150;
+    strip.leds[2].b = 200;
+
+    // Conversion from arrays (RGB and RGBW, depending on the amount of items)
+    strip.leds[3] = [100, 150, 200].into();
+    strip.leds[4] = [100, 150, 200, 50].into();
+
+    // Alternative way - use functions. Works exactly the same.
+    strip.leds[5] = Led::from_rgb(100, 150, 200);
+    strip.leds[6] = Led::from_rgbw(100, 150, 200, 50);
+
+    // Conversion from `palette` types
+    // Only f32 color types are currently supported
+    strip.leds[7] = Srgb::new(0.2, 0.4, 0.6).into();
+    strip.leds[8] = Hsv::new(0.5, 1.0, 1.0).into();
+    strip.leds[9] = Hsl::new(0.85, 0.8, 0.5).into();
 
     Ok(())
 }

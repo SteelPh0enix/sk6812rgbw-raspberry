@@ -71,11 +71,42 @@ strip.set_gradient(gradient);
 strip.update().unwrap();
 ```
 
+### Manually accessing LEDs
+
+```rust
+use sk6812_rpi::strip::{Bus, Strip}
+use sk6812_rpi::led::Led;
+use palette::{Hsv, Hsl, Srgb};
+
+let mut strip = Strip::new(Bus::Spi0, 10).unwrap();
+
+// Direct access to Led fields
+strip.leds[0].r = 100;
+strip.leds[1].g = 150;
+strip.leds[2].b = 200;
+
+// Conversion from arrays (RGB and RGBW, depending on the amount of items)
+strip.leds[3] = [100, 150, 200].into();
+strip.leds[4] = [100, 150, 200, 50].into();
+
+// Alternative way - use functions. Works exactly the same.
+strip.leds[5] = Led::from_rgb(100, 150, 200);
+strip.leds[6] = Led::from_rgbw(100, 150, 200, 50);
+
+// Conversion from `palette` types
+// Only f32 color types are currently supported
+strip.leds[7] = Srgb::new(0.2, 0.4, 0.6).into();
+strip.leds[8] = Hsv::new(0.5, 1.0, 1.0).into();
+strip.leds[9] = Hsl::new(0.85, 0.8, 0.5).into();
+
+// You can also iterate over LEDs via `iter`/`iter_mut`, and do anything else you can do on `Vec`.
+```
+
 For more examples and extended usage, look into [tests](./tests) and [src](./src) directory. There are tests for every module, presenting how to use most of the functions available.
 
 ## Common issues
 
-### SPI message is too long, program crashes on `Strip::update` call
+### SPI message is too long, `Strip::update` throws an error
 
 This is caused by default Raspbian SPI buffer size of 4096 bytes. To change it, edit `/boot/cmdline.txt` file and `spidev.bufsiz=65535` to the command line.
 
