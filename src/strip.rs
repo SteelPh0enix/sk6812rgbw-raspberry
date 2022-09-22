@@ -85,7 +85,7 @@ impl Strip {
     }
 
     fn get_led_data(&self) -> impl Iterator<Item = u8> + '_ {
-        self.leds.iter().flat_map(|led| led.to_sk6812_bytes())
+        self.leds.iter().flat_map(|led| led.to_raw_led_bytes())
     }
 }
 

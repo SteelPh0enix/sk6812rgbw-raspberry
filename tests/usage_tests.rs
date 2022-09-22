@@ -61,8 +61,8 @@ fn test_strip_clearing() -> Result<(), Box<dyn Error>> {
 #[test]
 fn test_strip_gradient() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
-    let colors: Vec<LinSrgb> = (0..10)
-        .map(|i| Srgb::from_color(Hsv::new(i as f32 * 36.0, 1.0, 0.8)).into_linear())
+    let colors: Vec<LinSrgb> = (0..=360)
+        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 1.0)).into_linear())
         .collect();
 
     let gradient = Gradient::new(colors);
@@ -76,8 +76,8 @@ fn test_strip_gradient() -> Result<(), Box<dyn Error>> {
 #[test]
 fn test_strip_gradient_shifting() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
-    let colors: Vec<LinSrgb> = (0..360)
-        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 0.8)).into_linear())
+    let colors: Vec<LinSrgb> = (0..=360)
+        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 1.0)).into_linear())
         .collect();
 
     let shift_delay = Duration::from_millis(50);

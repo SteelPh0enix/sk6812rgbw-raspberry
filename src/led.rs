@@ -58,7 +58,7 @@ impl Led {
 
     /// Converts the instance of this struct to SK6812-compatible byte array for SPI.
     /// Don't use in your own code, unless you know what you're doing.
-    pub fn to_sk6812_bytes(&self) -> Vec<u8> {
+    pub fn to_raw_led_bytes(&self) -> Vec<u8> {
         [self.g, self.r, self.b, self.w]
             .view_bits::<Msb0>()
             .iter()
@@ -285,7 +285,7 @@ mod tests {
             b: 0xFF,
             w: 0x33,
         };
-        let led_sk_bytes = led.to_sk6812_bytes();
+        let led_sk_bytes = led.to_raw_led_bytes();
 
         assert_eq!(led_sk_bytes.len(), 32);
 
