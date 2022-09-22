@@ -1,6 +1,6 @@
 use std::{error::Error, thread, time::Duration};
 
-use palette::{FromColor, Gradient, Hsv, LinSrgb, Srgb, Hsl};
+use palette::{FromColor, Gradient, Hsl, Hsv, LinSrgb, Srgb};
 use sk6812_rpi::led::Led;
 
 mod common;
@@ -116,6 +116,17 @@ fn test_direct_led_access() -> Result<(), Box<dyn Error>> {
     strip.leds[7] = Srgb::new(0.2, 0.4, 0.6).into();
     strip.leds[8] = Hsv::new(0.5, 1.0, 1.0).into();
     strip.leds[9] = Hsl::new(0.85, 0.8, 0.5).into();
+
+    Ok(())
+}
+
+#[test]
+fn test_led_manipulation() -> Result<(), Box<dyn Error>> {
+    let mut strip = common::make_strip();
+
+    strip.fill(Led::from_rgb(200, 100, 50));
+
+    strip.leds[0] /= 100;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 use bitvec::prelude::*;
 use palette::{rgb::Rgb, FromColor, Hsl, Hsv, Srgb};
@@ -176,8 +176,12 @@ impl Mul<f32> for Led {
     type Output = Self;
 
     fn mul(self, rhs: f32) -> Self::Output {
-        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
-        self * Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
+        Led {
+            r: (self.r as f32 * rhs) as u8,
+            g: (self.g as f32 * rhs) as u8,
+            b: (self.b as f32 * rhs) as u8,
+            w: (self.w as f32 * rhs) as u8,
+        }
     }
 }
 
@@ -185,8 +189,84 @@ impl Div<f32> for Led {
     type Output = Self;
 
     fn div(self, rhs: f32) -> Self::Output {
-        let rhs_u8: u8 = (rhs * (u8::MAX as f32)) as u8;
-        self / Led::from_rgbw(rhs_u8, rhs_u8, rhs_u8, rhs_u8)
+        Led {
+            r: (self.r as f32 / rhs) as u8,
+            g: (self.g as f32 / rhs) as u8,
+            b: (self.b as f32 / rhs) as u8,
+            w: (self.w as f32 / rhs) as u8,
+        }
+    }
+}
+
+impl AddAssign for Led {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign for Led {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
+    }
+}
+
+impl MulAssign for Led {
+    fn mul_assign(&mut self, rhs: Self) {
+        *self = *self * rhs;
+    }
+}
+
+impl DivAssign for Led {
+    fn div_assign(&mut self, rhs: Self) {
+        *self = *self / rhs;
+    }
+}
+
+impl AddAssign<u8> for Led {
+    fn add_assign(&mut self, rhs: u8) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign<u8> for Led {
+    fn sub_assign(&mut self, rhs: u8) {
+        *self = *self - rhs;
+    }
+}
+
+impl MulAssign<u8> for Led {
+    fn mul_assign(&mut self, rhs: u8) {
+        *self = *self * rhs;
+    }
+}
+
+impl DivAssign<u8> for Led {
+    fn div_assign(&mut self, rhs: u8) {
+        *self = *self / rhs;
+    }
+}
+
+impl AddAssign<f32> for Led {
+    fn add_assign(&mut self, rhs: f32) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign<f32> for Led {
+    fn sub_assign(&mut self, rhs: f32) {
+        *self = *self - rhs;
+    }
+}
+
+impl MulAssign<f32> for Led {
+    fn mul_assign(&mut self, rhs: f32) {
+        *self = *self * rhs;
+    }
+}
+
+impl DivAssign<f32> for Led {
+    fn div_assign(&mut self, rhs: f32) {
+        *self = *self / rhs;
     }
 }
 
@@ -359,6 +439,18 @@ mod tests {
 
         let led_added = led_a + led_b;
         assert_eq!(led_added, Led::from_rgbw(20, 30, 40, 50));
+
+        let mut led_c = led_a;
+        led_c += led_b;
+        assert_eq!(led_c, Led::from_rgbw(20, 30, 40, 50));
+
+        let mut led_d = led_a;
+        led_d += 10;
+        assert_eq!(led_d, Led::from_rgbw(20, 30, 40, 50));
+
+        let mut led_e = led_a;
+        led_e += 0.1;
+        assert_eq!(led_e, Led::from_rgbw(35, 45, 55, 65));
     }
 
     #[test]
@@ -366,8 +458,20 @@ mod tests {
         let led_a = Led::from_rgbw(10, 20, 30, 40);
         let led_b = Led::from_rgbw(10, 10, 10, 10);
 
-        let led_added = led_a - led_b;
-        assert_eq!(led_added, Led::from_rgbw(0, 10, 20, 30));
+        let led_subbed = led_a - led_b;
+        assert_eq!(led_subbed, Led::from_rgbw(0, 10, 20, 30));
+
+        let mut led_c = led_a;
+        led_c -= led_b;
+        assert_eq!(led_c, Led::from_rgbw(0, 10, 20, 30));
+
+        let mut led_d = led_a;
+        led_d -= 10;
+        assert_eq!(led_d, Led::from_rgbw(0, 10, 20, 30));
+
+        let mut led_e = led_a;
+        led_e -= 0.1;
+        assert_eq!(led_e, Led::from_rgbw(0, 0, 5, 15));
     }
 
     #[test]
@@ -375,8 +479,20 @@ mod tests {
         let led_a = Led::from_rgbw(10, 20, 30, 40);
         let led_b = Led::from_rgbw(3, 2, 1, 2);
 
-        let led_added = led_a * led_b;
-        assert_eq!(led_added, Led::from_rgbw(30, 40, 30, 80));
+        let led_multiplied = led_a * led_b;
+        assert_eq!(led_multiplied, Led::from_rgbw(30, 40, 30, 80));
+
+        let mut led_c = led_a;
+        led_c *= led_b;
+        assert_eq!(led_c, Led::from_rgbw(30, 40, 30, 80));
+
+        let mut led_d = led_a;
+        led_d *= 2;
+        assert_eq!(led_d, Led::from_rgbw(20, 40, 60, 80));
+
+        let mut led_e = led_a;
+        led_e *= 0.5;
+        assert_eq!(led_e, Led::from_rgbw(5, 10, 15, 20));
     }
 
     #[test]
@@ -384,7 +500,19 @@ mod tests {
         let led_a = Led::from_rgbw(10, 20, 30, 40);
         let led_b = Led::from_rgbw(2, 2, 1, 4);
 
-        let led_added = led_a / led_b;
-        assert_eq!(led_added, Led::from_rgbw(5, 10, 30, 10));
+        let led_divided = led_a / led_b;
+        assert_eq!(led_divided, Led::from_rgbw(5, 10, 30, 10));
+
+        let mut led_c = led_a;
+        led_c /= led_b;
+        assert_eq!(led_c, Led::from_rgbw(5, 10, 30, 10));
+
+        let mut led_d = led_a;
+        led_d /= 2;
+        assert_eq!(led_d, Led::from_rgbw(5, 10, 15, 20));
+
+        let mut led_e = led_a;
+        led_e /= 0.5;
+        assert_eq!(led_e, Led::from_rgbw(20, 40, 60, 80));
     }
 }
