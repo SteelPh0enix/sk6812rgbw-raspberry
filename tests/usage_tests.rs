@@ -10,9 +10,9 @@ fn test_strip_single_color_fill() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
 
     strip.fill(Led {
-        r: 200,
+        r: 150,
         g: 0,
-        b: 150,
+        b: 100,
         w: 0,
     });
     strip.update()?;
@@ -126,7 +126,30 @@ fn test_led_manipulation() -> Result<(), Box<dyn Error>> {
 
     strip.fill(Led::from_rgb(200, 100, 50));
 
-    strip.leds[0] /= 100;
+    strip.leds[0] /= 2;
+    strip.leds[1] *= 1.2;
+    strip.leds[2] += 50;
+
+    assert_eq!(strip.leds[0], Led::from_rgb(100, 50, 25));
+    assert_eq!(strip.leds[1], Led::from_rgb(240, 120, 60));
+    assert_eq!(strip.leds[2], Led::from_rgbw(250, 150, 100, 50));
+
+    strip.update()?;
+
+    Ok(())
+}
+
+#[test]
+fn test_led_iter_manipulation() -> Result<(), Box<dyn Error>> {
+    let mut strip = common::make_strip();
+
+    strip
+        .leds
+        .iter_mut()
+        .enumerate()
+        .for_each(|(index, led)| led.w = index as u8);
+
+    strip.update()?;
 
     Ok(())
 }

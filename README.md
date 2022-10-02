@@ -33,6 +33,9 @@ sk6812_rpi = "1.0"
 use sk6812_rpi::strip::{Bus, Strip};
 
 let mut strip = Strip::new(Bus::Spi0, 144).unwrap()
+
+// In case when you don't want to waste default slave-select pin, you can use this method and set it manually
+let mut other_strip = Strip::new_with_custom_ss(Bus::Spi1, 20, SlaveSelect::Ss10);
 ```
 
 ### Setting the strip to a specific RGB(W) color
@@ -99,7 +102,17 @@ strip.leds[7] = Srgb::new(0.2, 0.4, 0.6).into();
 strip.leds[8] = Hsv::new(0.5, 1.0, 1.0).into();
 strip.leds[9] = Hsl::new(0.85, 0.8, 0.5).into();
 
+// Mathematical operations are also supported
+strip.leds[7] /= 2;
+strip.leds[8] *= 1.5;
+strip.leds[9] += 20;
+
 // You can also iterate over LEDs via `iter`/`iter_mut`, and do anything else you can do on `Vec`.
+strip
+    .leds
+    .iter_mut()
+    .enumerate()
+    .for_each(|(index, led)| led.w = index as u8);
 ```
 
 For more examples and extended usage, look into [tests](./tests) and [src](./src) directory. There are tests for every module, presenting how to use most of the functions available.
