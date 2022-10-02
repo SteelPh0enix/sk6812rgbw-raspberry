@@ -1,9 +1,14 @@
 [package]
 name = "sk6812_rpi"
 version = "1.0.0"
+authors = ["SteelPh0enix <steelphoenix2137@gmail.com>"]
 edition = "2021"
 description = "SK6812RGBW library for RaspberryPi"
 readme = "README.md"
+repository = "https://github.com/SteelPh0enix/sk6812rgbw-raspberry"
+license = "MIT"
+keywords = ["raspberrypi", "led", "rgbw", "strip", "library"]
+categories = ["embedded"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
