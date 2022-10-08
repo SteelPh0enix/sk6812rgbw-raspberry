@@ -85,10 +85,10 @@ impl Add for Led {
 
     fn add(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.add(rhs.r),
-            self.g.add(rhs.g),
-            self.b.add(rhs.b),
-            self.w.add(rhs.w),
+            self.r.saturating_add(rhs.r),
+            self.g.saturating_add(rhs.g),
+            self.b.saturating_add(rhs.b),
+            self.w.saturating_add(rhs.w),
         ])
     }
 }
@@ -98,10 +98,10 @@ impl Sub for Led {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.sub(rhs.r),
-            self.g.sub(rhs.g),
-            self.b.sub(rhs.b),
-            self.w.sub(rhs.w),
+            self.r.saturating_sub(rhs.r),
+            self.g.saturating_sub(rhs.g),
+            self.b.saturating_sub(rhs.b),
+            self.w.saturating_sub(rhs.w),
         ])
     }
 }
@@ -111,10 +111,10 @@ impl Mul for Led {
 
     fn mul(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.mul(rhs.r),
-            self.g.mul(rhs.g),
-            self.b.mul(rhs.b),
-            self.w.mul(rhs.w),
+            self.r.saturating_mul(rhs.r),
+            self.g.saturating_mul(rhs.g),
+            self.b.saturating_mul(rhs.b),
+            self.w.saturating_mul(rhs.w),
         ])
     }
 }
@@ -124,10 +124,10 @@ impl Div for Led {
 
     fn div(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.div(rhs.r),
-            self.g.div(rhs.g),
-            self.b.div(rhs.b),
-            self.w.div(rhs.w),
+            self.r.saturating_div(rhs.r),
+            self.g.saturating_div(rhs.g),
+            self.b.saturating_div(rhs.b),
+            self.w.saturating_div(rhs.w),
         ])
     }
 }
