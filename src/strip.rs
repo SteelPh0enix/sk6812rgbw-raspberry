@@ -13,6 +13,7 @@ const SPI_FREQUENCY: u32 = 6_400_000;
 
 /// Structure representing whole SK6812RGBW strip.
 /// Should be compatible with other similar LED's, but they would likely require a different bit ordering
+#[derive(Debug)]
 pub struct Strip {
     spi: Spi,
     pub leds: Vec<Led>,

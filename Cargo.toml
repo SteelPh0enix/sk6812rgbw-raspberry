@@ -1,6 +1,6 @@
 [package]
 name = "sk6812_rpi"
-version = "1.0.0"
+version = "0.1.0"
 authors = ["SteelPh0enix <steelphoenix2137@gmail.com>"]
 edition = "2021"
 description = "SK6812RGBW library for RaspberryPi"
