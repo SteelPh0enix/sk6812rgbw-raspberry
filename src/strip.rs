@@ -52,6 +52,7 @@ impl Strip {
         self.leds.fill(Led::new());
     }
 
+    // Set the strip LED colors to a `palette` gradient
     pub fn set_gradient(&mut self, gradient: Gradient<LinSrgb>) {
         gradient
             .take(self.leds.len())
@@ -62,10 +63,13 @@ impl Strip {
     }
 
     // "Rotate" LEDs to the beginning of the strip - move the first LED color to the end, 2nd to the first, and so on.
+    // This description assumes that strip goes left-to-right
     pub fn shift_left(&mut self, count: usize) {
         self.leds.rotate_left(count);
     }
 
+    // "Rotate" LEDs to the end of the strip - move the last LED color to the beginning, 1st to 2nd, and so on.
+    // This description assumes that strip goes left-to-right
     pub fn shift_right(&mut self, count: usize) {
         self.leds.rotate_right(count);
     }
@@ -84,6 +88,7 @@ impl Strip {
         Ok(())
     }
 
+    // Get raw LED bytes, ready to send via SPI. This function is called internally by the library and usually you don't need to worry about it.
     fn raw_led_data(&self) -> impl Iterator<Item = u8> + '_ {
         self.leds.iter().flat_map(|led| led.to_raw_led_bytes())
     }

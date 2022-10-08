@@ -11,9 +11,13 @@ const BIT_LOW: u8 = 0b11000000;
 /// Structure representing a single RGBW LED
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Led {
+    // Red color
     pub r: u8,
+    // Green color
     pub g: u8,
+    // Blue color
     pub b: u8,
+    // White color
     pub w: u8,
 }
 
@@ -22,6 +26,7 @@ impl Led {
         Default::default()
     }
 
+    // Create LED from RGB 8-bit colors. White is set to 0.
     pub fn from_rgb(red: u8, green: u8, blue: u8) -> Self {
         Self {
             r: red,
@@ -31,6 +36,7 @@ impl Led {
         }
     }
 
+    // Create LED from RGBW 8-bit colors.
     pub fn from_rgbw(red: u8, green: u8, blue: u8, white: u8) -> Self {
         Self {
             r: red,
@@ -40,18 +46,22 @@ impl Led {
         }
     }
 
+    // Create LED from 3-element array of 8-bit values. The order of colors is red, green, blue. White is set to 0.
     pub fn from_rgb_array(data: [u8; 3]) -> Self {
         data.into()
     }
 
+    // Create LED from 4-element array of 8-bit values. The order of colors is red, green, blue, white.
     pub fn from_rgbw_array(data: [u8; 4]) -> Self {
         data.into()
     }
 
+    // Convert the LED into 4-element RGBW 8-bit array
     pub fn into_rgbw_array(self) -> [u8; 4] {
         self.into()
     }
 
+    // Convert the LED into 3-element RGB 8-bit array
     pub fn into_rgb_array(self) -> [u8; 3] {
         self.into()
     }
@@ -75,10 +85,10 @@ impl Add for Led {
 
     fn add(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.checked_add(rhs.r).or(Some(u8::MAX)).unwrap(),
-            self.g.checked_add(rhs.g).or(Some(u8::MAX)).unwrap(),
-            self.b.checked_add(rhs.b).or(Some(u8::MAX)).unwrap(),
-            self.w.checked_add(rhs.w).or(Some(u8::MAX)).unwrap(),
+            self.r.add(rhs.r),
+            self.g.add(rhs.g),
+            self.b.add(rhs.b),
+            self.w.add(rhs.w),
         ])
     }
 }
@@ -88,10 +98,10 @@ impl Sub for Led {
 
     fn sub(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.checked_sub(rhs.r).or(Some(0)).unwrap(),
-            self.g.checked_sub(rhs.g).or(Some(0)).unwrap(),
-            self.b.checked_sub(rhs.b).or(Some(0)).unwrap(),
-            self.w.checked_sub(rhs.w).or(Some(0)).unwrap(),
+            self.r.sub(rhs.r),
+            self.g.sub(rhs.g),
+            self.b.sub(rhs.b),
+            self.w.sub(rhs.w),
         ])
     }
 }
@@ -101,10 +111,10 @@ impl Mul for Led {
 
     fn mul(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.checked_mul(rhs.r).or(Some(u8::MAX)).unwrap(),
-            self.g.checked_mul(rhs.g).or(Some(u8::MAX)).unwrap(),
-            self.b.checked_mul(rhs.b).or(Some(u8::MAX)).unwrap(),
-            self.w.checked_mul(rhs.w).or(Some(u8::MAX)).unwrap(),
+            self.r.mul(rhs.r),
+            self.g.mul(rhs.g),
+            self.b.mul(rhs.b),
+            self.w.mul(rhs.w),
         ])
     }
 }
@@ -114,10 +124,10 @@ impl Div for Led {
 
     fn div(self, rhs: Self) -> Self::Output {
         Led::from_rgbw_array([
-            self.r.checked_div(rhs.r).or(Some(0)).unwrap(),
-            self.g.checked_div(rhs.g).or(Some(0)).unwrap(),
-            self.b.checked_div(rhs.b).or(Some(0)).unwrap(),
-            self.w.checked_div(rhs.w).or(Some(0)).unwrap(),
+            self.r.div(rhs.r),
+            self.g.div(rhs.g),
+            self.b.div(rhs.b),
+            self.w.div(rhs.w),
         ])
     }
 }
@@ -353,8 +363,6 @@ impl From<Hsl> for Led {
 
 #[cfg(test)]
 mod tests {
-    use palette::Srgb;
-
     use super::*;
 
     #[test]
