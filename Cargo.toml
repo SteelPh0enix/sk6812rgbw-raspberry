@@ -9,6 +9,7 @@ repository = "https://github.com/SteelPh0enix/sk6812rgbw-raspberry"
 license = "MIT"
 keywords = ["raspberrypi", "led", "rgbw", "strip", "library"]
 categories = ["embedded"]
+documentation = "https://docs.rs/sk6812_rpi"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
