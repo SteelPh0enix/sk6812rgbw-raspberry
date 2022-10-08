@@ -270,15 +270,15 @@ impl DivAssign<f32> for Led {
     }
 }
 
-impl Into<[u8; 3]> for Led {
-    fn into(self) -> [u8; 3] {
-        [self.r, self.g, self.b]
+impl From<Led> for [u8; 3] {
+    fn from(led: Led) -> Self {
+        [led.r, led.g, led.b]
     }
 }
 
-impl Into<[u8; 4]> for Led {
-    fn into(self) -> [u8; 4] {
-        [self.r, self.g, self.b, self.w]
+impl From<Led> for [u8; 4] {
+    fn from(led: Led) -> Self {
+        [led.r, led.g, led.b, led.w]
     }
 }
 
@@ -304,12 +304,12 @@ impl From<[u8; 4]> for Led {
     }
 }
 
-impl Into<Rgb> for Led {
-    fn into(self) -> Rgb {
+impl From<Led> for Rgb {
+    fn from(led: Led) -> Self {
         Rgb::new(
-            (self.r as f32) / (u8::MAX as f32),
-            (self.g as f32) / (u8::MAX as f32),
-            (self.b as f32) / (u8::MAX as f32),
+            (led.r as f32) / (u8::MAX as f32),
+            (led.g as f32) / (u8::MAX as f32),
+            (led.b as f32) / (u8::MAX as f32),
         )
     }
 }
@@ -325,9 +325,9 @@ impl From<Rgb> for Led {
     }
 }
 
-impl Into<Hsv> for Led {
-    fn into(self) -> Hsv {
-        let srgb_color: Srgb = self.into();
+impl From<Led> for Hsv {
+    fn from(led: Led) -> Self {
+        let srgb_color: Srgb = led.into();
         Hsv::from_color(srgb_color)
     }
 }
@@ -338,9 +338,9 @@ impl From<Hsv> for Led {
     }
 }
 
-impl Into<Hsl> for Led {
-    fn into(self) -> Hsl {
-        let srgb_color: Srgb = self.into();
+impl From<Led> for Hsl {
+    fn from(led: Led) -> Self {
+        let srgb_color: Srgb = led.into();
         Hsl::from_color(srgb_color)
     }
 }
