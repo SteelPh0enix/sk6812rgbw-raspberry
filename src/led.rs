@@ -9,7 +9,7 @@ const BIT_HIGH: u8 = 0b11110000;
 const BIT_LOW: u8 = 0b11000000;
 
 /// Structure representing a single RGBW LED
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Led {
     pub r: u8,
     pub g: u8,
@@ -48,11 +48,11 @@ impl Led {
         data.into()
     }
 
-    pub fn to_rgbw_array(self) -> [u8; 4] {
+    pub fn into_rgbw_array(self) -> [u8; 4] {
         self.into()
     }
 
-    pub fn to_rgb_array(self) -> [u8; 3] {
+    pub fn into_rgb_array(self) -> [u8; 3] {
         self.into()
     }
 
@@ -390,8 +390,8 @@ mod tests {
             w: 40,
         };
 
-        assert_eq!(led.to_rgbw_array(), [10, 20, 30, 40]);
-        assert_eq!(led.to_rgb_array(), [10, 20, 30]);
+        assert_eq!(led.into_rgbw_array(), [10, 20, 30, 40]);
+        assert_eq!(led.into_rgb_array(), [10, 20, 30]);
     }
 
     #[test]
@@ -399,8 +399,8 @@ mod tests {
         let led_rgb = Led::from_rgb_array([10, 20, 30]);
         let led_rgbw = Led::from_rgbw_array([10, 20, 30, 40]);
 
-        assert_eq!(led_rgb.to_rgb_array(), [10, 20, 30]);
-        assert_eq!(led_rgbw.to_rgbw_array(), [10, 20, 30, 40]);
+        assert_eq!(led_rgb.into_rgb_array(), [10, 20, 30]);
+        assert_eq!(led_rgbw.into_rgbw_array(), [10, 20, 30, 40]);
     }
 
     #[test]

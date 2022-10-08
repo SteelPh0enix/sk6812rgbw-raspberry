@@ -62,7 +62,7 @@ fn test_strip_clearing() -> Result<(), Box<dyn Error>> {
 fn test_strip_gradient() -> Result<(), Box<dyn Error>> {
     let mut strip = common::make_strip();
     let colors: Vec<LinSrgb> = (0..=360)
-        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 1.0)).into_linear())
+        .map(|i| Srgb::from_color(Hsv::new(i as f32, 1.0, 0.5)).into_linear())
         .collect();
 
     let gradient = Gradient::new(colors);

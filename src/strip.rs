@@ -77,14 +77,14 @@ impl Strip {
     /// If you're getting an error, telling you that the message is too long - increase the SPI transfer size in `/boot/cmdline.txt`.
     /// To do so, add `spidev.bufsiz=65535` to the first line of this file. I added it right before `rootwait`, but placement shouldn't matter.
     pub fn update(&mut self) -> Result<(), Box<dyn Error>> {
-        let led_data: Vec<u8> = self.get_led_data().collect();
+        let led_data: Vec<u8> = self.raw_led_data().collect();
         self.spi.write(&led_data)?;
         thread::sleep(Duration::from_micros(80));
 
         Ok(())
     }
 
-    fn get_led_data(&self) -> impl Iterator<Item = u8> + '_ {
+    fn raw_led_data(&self) -> impl Iterator<Item = u8> + '_ {
         self.leds.iter().flat_map(|led| led.to_raw_led_bytes())
     }
 }
