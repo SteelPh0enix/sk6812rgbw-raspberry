@@ -22,7 +22,7 @@ Just add it to your `Cargo.toml`
 
 ```toml
 [dependencies]
-sk6812_rpi = "1.0"
+sk6812_rpi = "0.1"
 ```
 
 ## Usage and examples
